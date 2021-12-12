@@ -562,7 +562,140 @@ export const AnimatedHamburger: React.FC<AnimatedHamburgerProps> = (props) => {}
 ```
 quindi abbiamo definito come devo essere gli item e siamo andati a specificare le props del nostro componente tipizzandole ( al loro interno quindi ci sarà la proprietà *componentItems*).
 
+```js
+export const AnimatedHamburger: React.FC<AnimatedHamburgerProps> = (props) => {
 
+    const [opened, setOpened] = useState<boolean>(false);
+    return (
+        <nav className="menu">
+            <div className={cn('menu-open', { 'opened': opened })} />
+            <label className="menu-open-button" onClick={() => setOpened(!opened)}>
+                <span className="hamburger hamburger-1"></span>
+                <span className="hamburger hamburger-2"></span>
+                <span className="hamburger hamburger-3"></span>
+            </label>
+
+            {
+                props.componentItems.map(item => {
+                    return (
+                        <div className="menu-item">
+                            <i className={item.icon} />
+                        </div>);
+                })
+            }
+        </nav>
+    )
+}
+```
+
+all'interno del componente utilizziamo lo stesso *map* visto in precedenza ma questa volte utilizziamo *componentItems* delle *props*.
+
+Nella nostra *App()* per poter utilizzare il componente appena definito possiamo farlo in questo modo:
+
+```js
+import './App.css';
+import { AnimatedHamburger } from './components/AnimatedHamburger';
+
+const items = [
+  {icon: 'fa fa-google', url: 'http://www.google.com'},
+  {icon: 'fa fa-windows', url: 'http://www.microsoft.com'},
+  {icon: 'fa fa-facebook', url: 'http://www.facebook.com'},
+  {icon: 'fa fa-linkedin', url: 'http://www.linkedin.com'},
+  {icon: 'fa fa-instagram', url: 'http://www.instagram.com'},
+  {icon: 'fa fa-youtube', url: 'http://www.youtube.com'}
+]
+
+function App() {
+
+  return (
+      <AnimatedHamburger componentItems={items}/>
+  );
+}
+
+export default App;
+```
+come possiamo vedere utilizziamo l'*AnimatedHamburger* andando a specificare le sue props (componentItems).
+
+Oltre a proprietà possiamo anche definire degli eventi o dei metodi che il nostro componemente deve fare in base a ciò che viene definito dal componente *padre* o dal componente che lo utilizza. 
+
+introduciamo quindi il metodo onIconClick all'interno dell'interfaccia *AnimatedHamburgerProps* e facciamo tornare *void*, cioè non fa nulla. Passiamogli però il parametro ```url: string```
+All'interno del metodo *IconClickHandler* andiamo a richiamare la nostra nuova proprietà e successivamente invochiamo tale metodo in corrispondenza del click dell'icona. 
+```js
+import { useState } from "react";
+import cn from 'classnames';
+
+interface Item {
+    icon: string;
+    url: string;
+}
+
+interface AnimatedHamburgerProps {
+    componentItems: Item[];
+    onIconClick: (url: string) => void;
+}
+
+export const AnimatedHamburger: React.FC<AnimatedHamburgerProps> = (props) => {
+
+    const [opened, setOpened] = useState<boolean>(false);
+
+    const IconClickHandler = (url: string) => {
+       props.onIconClick(url);
+    }
+
+    return (
+        <nav className="menu">
+            <div className={cn('menu-open', { 'opened': opened })} />
+            <label className="menu-open-button" onClick={() => setOpened(!opened)}>
+                <span className="hamburger hamburger-1"></span>
+                <span className="hamburger hamburger-2"></span>
+                <span className="hamburger hamburger-3"></span>
+            </label>
+
+            {
+                props.componentItems.map(item => {
+                    return (
+                        <div className="menu-item" onClick={() => IconClickHandler(item.url)}>
+                            <i className={item.icon} />
+                        </div>);
+                })
+            }
+        </nav>
+    )
+}
+
+```
+
+Lato App() invece nella props *onIconClick* andiamo a richiamare il metodo goToLink della stessa componente App. Quindi all'evento di click corrisponderà l'invocazione del metodo *goToLink* che verrà assegnato alla proprietà onIconClick del nostro componente:
+```js
+import './App.css';
+import { AnimatedHamburger } from './components/AnimatedHamburger';
+
+const items = [
+  {icon: 'fa fa-google', url: 'http://www.google.com'},
+  {icon: 'fa fa-windows', url: 'http://www.microsoft.com'},
+  {icon: 'fa fa-facebook', url: 'http://www.facebook.com'},
+  {icon: 'fa fa-linkedin', url: 'http://www.linkedin.com'},
+  {icon: 'fa fa-instagram', url: 'http://www.instagram.com'},
+  {icon: 'fa fa-youtube', url: 'http://www.youtube.com'}
+]
+
+function App() {
+
+  const goToLink = (url: string)=>{
+        window.open(url);
+     }
+
+  return (
+      <AnimatedHamburger componentItems={items} onIconClick={goToLink}/>
+  );
+}
+
+export default App;
+```
+
+**Caricamento lato server**
+
+1.41.36
 
 https://codepen.io/lbebber/pen/RNgBPP
 
