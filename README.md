@@ -695,9 +695,151 @@ export default App;
 
 **Caricamento lato server**
 
-1.41.36
+Facciamo che i dati di item li recuperiamo chiamando un API. Per simulare un server che ci fornisca delle API da chiamare possiamo utilizzare *JSON Server*
+```
+npm install json-server
+```
+creiamo nel nostro progetto un file chiamato *db.json* ed inseriamo le informazioni
+```json
+{
+    "config": [
+        {
+            "icon": "fa fa-google",
+            "url": "http://www.google.com"
+        },
+        {
+            "icon": "fa fa-windows",
+            "url": "http://www.microsoft.com"
+        },
+        {
+            "icon": "fa fa-facebook",
+            "url": "http://www.facebook.com"
+        },
+        {
+            "icon": "fa fa-linkedin",
+            "url": "http://www.linkedin.com"
+        },
+        {
+            "icon": "fa fa-instagram",
+            "url": "http://www.instagram.com"
+        },
+        {
+            "icon": "fa fa-youtube",
+            "url": "http://www.youtube.com"
+        }
+    ]
+}
+```
 
-https://codepen.io/lbebber/pen/RNgBPP
+aggiungiamo al package.json il comando per eseguire il server fake: 
+```json
+  "scripts": {
+    "server": "json-server --watch server/db.json --port 3001"
+  }
+  ```
+in questo modo avremo il server sulla porta 3001 che ci risponde al path  ```http://localhost:3001/config```.
+
+Per la comunicazione con server React non fornisce nessuna funzionalità per questo andremo ad installare una libreria esterna **Axios**.
+
+```
+npm install axios
+```
+
+Adesso andremo ad usare un altro *hook* di React ovvero **useEffect()**
+useEffect() si utilizza quando si vogliono fetchare dati, effettuare sottoscrizioni o cambiare il DOM manualmente e quindi tutto ciò che non può esser fatto durante il rendering e che potrebbe essere un *side effect* per altri componenti.
+Quando si usa useEffect si dice a React di applicare "l'effetto" dopo aver flushato le modifiche al DOM. Gli effects sono dichiarati all'interno del componente in modo che possano accedere alle props e allo stato.
+Di base React esegue gli effects dopo ogni rendering incluso il primo.
+
+Inoltre possiamo applicare un effects ad un componente specificando in maniera opzionale che esso può essere applicato solo in seguito a  cambiamenti di proprietà o di stati del componente stesso. Se specifichiamo le opzione di *useEffect* con le parentesi quadre vuote questo verrà processato solo allo start del componente, una sorta di *init()*.
+
+```js
+useEffect(() => {
+  console.log('ciao')
+}, [])
+```
+
+Nel caso di caricamento lato server questo ci torna comodo perchè andremo a caricare le informazioni che ci servono solo all'avvio dell'applicazione e non ogni volta che il componente cambia di stato.
+
+  const [items, setItems] = useState<Item[]>([]);
+```js
+useEffect(() => {
+  axios.get<Item[]>('http://localhost:3001/config')
+  .then(res => {
+    setItems(res.data)
+  })
+}, [])
+```
+In questo modo non abbiamo più bisogno di avere gli items definiti in maniera statica ma stiamo caricando le informazioni da server.
+
+**ROUTING**
+Installiamo la libreria React-Router
+```
+npm i react-router-dom @types/react-router-dom
+```
+
+Facciamo che al posto degli url vogliamo che la nostra app mostri delle pagine. 
+Possiamo definire una nuova pagina della nostra applicazione come un nuovo componente. Ad esempio definiamo il componente HomePage:
+```ts
+import { NavLink } from "react-router-dom"
+
+export const HomePage: React.FC = () => {
+    return (
+    <div className="page">
+        <div className="page-wrapper">
+            HomePage
+            <NavLink to="/">
+                <i className="fa fa-times close-button"/>
+            </NavLink>
+        </div>    
+    </div>
+    )
+}
+```
+Dove NavLink è un compoente di react-router-dom che ci consente di specificificare una volta usciti dalla nuova pagina dove tornare.
+
+Inseriamo questa pagina quindi nella nostra applicazione in corrispondenza del path ```/home```
+
+per fare questo ricorriamo nuovamente alla libreria react-router-dom
+ utilizzando 
+```js
+    <BrowserRouter>
+      <Routes>
+        <Route path='/home' element={<HomePage/>}/>
+        <Route path='/catalog' element={<CatalogPage/>}/>
+        <Route path='/home' element={<ContactsPage/>}/>
+      </Routes>
+    </BrowserRouter>
+```
+in questo modo quindi apriremo in una nuova scheda il nuovo componente dichiarato seguendo il path indicato
+```js
+function App() {
+  const [items, setItems] = useState<Item[]>([]);
+
+useEffect(() => {
+  axios.get<Item[]>('http://localhost:3001/config')
+  .then(res => {
+    setItems(res.data)
+  })
+}, [])
+
+  const goToLink = (url: string)=>{
+        window.open(url);
+     }
+
+  return (
+    <>
+    <AnimatedHamburger componentItems={items} onIconClick={goToLink} />
+    <BrowserRouter>
+      <Routes>
+        <Route path='/home' element={<HomePage/>}/>
+        <Route path='/catalog' element={<CatalogPage/>}/>
+        <Route path='/home' element={<ContactsPage/>}/>
+      </Routes>
+    </BrowserRouter>
+    </>
+  );
+}
+```
 
 
 
