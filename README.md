@@ -745,8 +745,8 @@ Per la comunicazione con server React non fornisce nessuna funzionalità per que
 npm install axios
 ```
 
-Adesso andremo ad usare un altro *hook* di React ovvero **useEffect()**
-useEffect() si utilizza quando si vogliono fetchare dati, effettuare sottoscrizioni o cambiare il DOM manualmente e quindi tutto ciò che non può esser fatto durante il rendering e che potrebbe essere un *side effect* per altri componenti.
+Adesso andremo ad usare un altro *hook* di React ovvero **useEffect()**.
+*useEffect()* si utilizza quando si vogliono fetchare dati, effettuare sottoscrizioni o cambiare il DOM manualmente e quindi tutto ciò che non può esser fatto durante il rendering e che potrebbe essere un *side effect* per altri componenti.
 Quando si usa useEffect si dice a React di applicare "l'effetto" dopo aver flushato le modifiche al DOM. Gli effects sono dichiarati all'interno del componente in modo che possano accedere alle props e allo stato.
 Di base React esegue gli effects dopo ogni rendering incluso il primo.
 
@@ -759,9 +759,9 @@ useEffect(() => {
 ```
 
 Nel caso di caricamento lato server questo ci torna comodo perchè andremo a caricare le informazioni che ci servono solo all'avvio dell'applicazione e non ogni volta che il componente cambia di stato.
-
-  const [items, setItems] = useState<Item[]>([]);
 ```js
+  const [items, setItems] = useState<Item[]>([]);
+  
 useEffect(() => {
   axios.get<Item[]>('http://localhost:3001/config')
   .then(res => {
